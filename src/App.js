@@ -21,6 +21,12 @@ export default class App extends React.Component {
     return list[0];
   }
 
+  isWinningPiece = (x, y) => {
+    const { winner, winningMoves } = this.state;
+    if (!winner) return false;
+    return winningMoves.some(item => (item.x === x && item.y === y));
+  }
+
   getWinningMovesForVelocty = (xPosition, yPosition, xVelocity, yVelocity) => {
     const winningMoves = [{ x: xPosition, y: yPosition }];
     const player = this.getPiece(xPosition, yPosition).player;
@@ -65,7 +71,7 @@ export default class App extends React.Component {
 
   addMove = (x, y) => {
     const { playerTurn } = this.state;
-    const nextPlayerTurn = playerTurn === 'red' ? 'yellow' : 'red';
+    const nextPlayerTurn = playerTurn === 'red' ? 'blue' : 'red';
     let availableYPosition = null;
     for (let position = this.state.rows - 1; position >= 0; position--) {
       if (!this.getPiece(x, position)) {
@@ -87,8 +93,9 @@ export default class App extends React.Component {
       const columnViews = [];
       for (let column = 0; column < this.state.columns; column += 1) {
         const piece = this.getPiece(column, row);
+        const winner = this.isWinningPiece(column, row);
         columnViews.push(
-          <div onClick={() => {this.addMove(column, row)}} style={{ width: '100px', height: '100px', backgroundColor: '#00a8ff', display: 'flex', padding: 5, cursor: 'pointer' }}>
+          <div onClick={() => {this.addMove(column, row)}} style={{ width: '8vw', height: '8vw', backgroundColor: winner ? 'yellow' : '#333', display: 'flex', padding: 5, cursor: 'pointer' }}>
             <div style={{ borderRadius: '50%', backgroundColor: 'white', flex: 1, padding: 3, display: 'flex' }}>
               {piece ? <div style={{ backgroundColor: piece.player, flex: 1, borderRadius: '50%', border: '1px solid #333' }}/> : undefined}
             </div>
@@ -100,10 +107,11 @@ export default class App extends React.Component {
       );
     }
     
-
+    // draw (in return function):
+    // {!winner && <div onClick={this.resetBoard} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, zIndex: 3, backgroundColor: 'rgba(0, 0, 0, .5)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#fff', fontWeight: '200', fontSize: '8vw' }}>{`draw!`}</div>}
     return(
       <div style={{ backgroundColor: 'red', display: 'flex', flexDirection: 'column' }}>
-        {winner && <div onClick={this.resetBoard} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, zIndex: 3, backgroundColor: 'rgba(0, 0, 0, .5)', display: 'flex', justifyContent: 'center', alignItems: 'center',color: '#fff', fontWeight: '200', fontSize: '8vw' }}>{`${winner} WINS!!`}</div>}
+        {winner && <div onClick={this.resetBoard} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, zIndex: 3, backgroundColor: 'rgba(0, 0, 0, .5)', display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#fff', fontWeight: '200', fontSize: '8vw' }}>{`${winner} wins!`}</div>}
         {rowViews}
       </div>
     );
